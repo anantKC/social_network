@@ -1,0 +1,35 @@
+{% extends 'social_network_core_app:base.html' %}
+
+{% block content %}
+    <h1>{{ room.name }}</h1>
+    <div id="message-container">
+        {% for message in messages %}
+            <p>{{ message.sender }} - {{ message.timestamp }}</p>
+            <p>{{ message.content }}</p>
+        {% endfor %}
+    </div>
+    <form id="message-form">
+        {% csrf_token %}
+        <input type="hidden" name="room_id" value="{{ room.id }}">
+        <input type="text" name="content">
+        <button type="submit">Send</button>
+    </form>
+
+    <script>
+        const form = document.getElementById('message-form');
+        form.addEventListener('submit', event => {
+            event.preventDefault();
+            const formData = new FormData(form);
+            const url = '{% url "message_create" %}';
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => {
+                if (response.ok) {
+                    form.reset();
+                }
+            });
+        });
+    </script>
+{% endblock %}
